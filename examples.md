@@ -200,3 +200,37 @@ Es wurde keine Rechnung erzeugt. Für diesen Fall ist eine andere Form nötig.
 ```
 
 No partial invoice. No attempt to bill the 4 hours anyway. Trigger named, refused, done.
+
+---
+
+## Example 4 — receipt read from a photo, unreadable digit not guessed
+
+The job record points to a photo in `input/belege/` instead of describing the receipt. The translator reads it, and where a digit is not legible, it marks it rather than guessing.
+
+### Input (job record line)
+
+```
+Material: siehe Beleg input/belege/beleg-baumarkt-08-09.png
+```
+
+### Intermediate step the translator emits first (human confirms it)
+
+```
+Beleg-Extraktion
+| Datei                      | Händler              | Datum      | Position              | Betrag netto | Lesbarkeit |
+| beleg-baumarkt-08-09.png   | Baumarkt Musterstadt | 08.09.2026 | Dichtungssortiment+Öl | 42,02 €      | klar       |
+```
+
+That confirmed 42,02 € then feeds the Material line exactly as in Example 1: `42,02 × 1,15 = 48,32 €`, tagged `Q → Beleg-Foto beleg-baumarkt-08-09.png`.
+
+### What happens when a digit is smudged
+
+Had the total read `6?,80 €` with the second figure unclear:
+
+```
+| beleg-farbenhaus-10-09.jpg | Farbenhaus | 10.09.2026 | Holzlack+Pinsel | 6?,80 € | zweite Ziffer nicht sicher lesbar |
+```
+
+The Material line stays, the amount is `nicht sicher lesbar`, it is excluded from every sum, and it is flagged for confirmation. No plausible `63,80` gets invented from a blur.
+
+The photo raises the bar, it does not lower it. The one way to lose this comp is an invented number, and a blurry receipt is the easiest place to trip it. Unreadable means unreadable.

@@ -19,7 +19,7 @@ Every invoice ends with a **Quellennachweis**: one row per output value, tagged 
 ## How to use it
 
 1. Drop this folder into a Claude project.
-2. Feed it a job record shaped like [`input/beispiel-job-musterstadt.md`](input/beispiel-job-musterstadt.md).
+2. Feed it a job record shaped like [`input/beispiel-job-musterstadt.md`](input/beispiel-job-musterstadt.md). Receipts can be **described in text**, or dropped in as **photos / scans** in `input/belege/`. The translator reads the image directly and refuses to guess an unreadable digit (see [`reference/beleg-lesen.md`](reference/beleg-lesen.md)).
 3. Get back a finished Rechnung plus its Quellennachweis. It lands in `output/`.
 
 The instruction to Claude: *"You are the translator defined by `identity.md` and `rules.md`. Convert the job record I give you into a Rechnung. Follow the contract exactly."*
@@ -41,7 +41,9 @@ reference/         the contract this folder promises to keep
   out-of-scope.md    what the translator refuses and why
   team/              one file per worker; the billable rate lives here, the wage stays internal
   contracts/         one file per job; parties, agreed rates, payment terms
+  beleg-lesen.md     how to read a receipt photo/scan without inventing a digit
 input/             a real sample job record you can run
+  belege/            receipt photos/scans; read directly, not transcribed
 output/            where finished invoices land
 ```
 

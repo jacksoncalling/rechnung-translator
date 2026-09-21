@@ -52,9 +52,10 @@ If the job names a contract that has no file, stop and say so. Do not invent a c
 - Never sum hours the log did not state. Never apply a rate not found in contract/pricing/team.
 
 ### Leistungen — material
-- One line per receipt. Description and purchase amount are **Q** (from the receipt as described).
+- A receipt may be **described in text** in the job record, or **supplied as a photo / scan / PDF** in `input/belege/` (or attached). Either way the amount is **Q**. For an image the cited source is the file name; read it per `reference/beleg-lesen.md`.
+- One line per receipt. Description and purchase amount are **Q**.
 - Line net = purchase amount **(Q)** × (1 + Materialaufschlag **(R)**), shown as **(A)**: `Einkauf X,XX € × 1,NN = Y,YY €`.
-- If a receipt's amount is not readable/stated, the line stays, the amount is `nicht in Quelle`, and it is **excluded from every sum** and flagged. Never estimate a material cost.
+- If a receipt's amount is not stated, not readable, or only partly legible, the line stays, the amount is `nicht in Quelle` / `nicht sicher lesbar`, and it is **excluded from every sum** and flagged. Never estimate a material cost, and never guess a smudged digit into a plausible one.
 
 ### Leistungen — travel
 - Only if the job record states kilometers or a countable trip distance.
