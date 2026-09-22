@@ -14,6 +14,7 @@ Die Rückfall-Sätze, wenn der Vertrag nichts anderes sagt. Werden als **R** üb
 | Fahrtkosten | 0,50 € / km | Anfahrt, gilt als Arbeits-/Nebenkosten (§ 35a EStG) |
 | Materialaufschlag | 15 % | auf den Einkaufspreis laut Beleg |
 | USt-Satz | 19 % | Regelbesteuerung |
+| Währung | immer EUR | Beträge ohne Symbol sind Euro; danach wird nie gefragt |
 
 ## Regeln zur Anwendung
 

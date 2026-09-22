@@ -1,0 +1,31 @@
+{
+  "_comment": "Single source of truth for checks.py. To retune the eval, edit this file, not the code.",
+  "reference_dir": "../reference",
+  "vat_rate": "0.19",
+  "material_markup": "0.15",
+  "tags": ["Q", "R", "A", "∅"],
+  "required_fields": ["Rechnungsnummer", "Rechnungsdatum", "Empfänger"],
+  "sections": {
+    "kopf": "## Kopf",
+    "arbeit": "## Arbeitsleistung",
+    "material": "## Material",
+    "fahrt": "## Fahrtkosten",
+    "summen": "## Summen",
+    "zahlung": "## Zahlung",
+    "quellennachweis": "## Quellennachweis",
+    "nicht_abgebildet": "## Nicht abgebildet",
+    "rueckfragen": "## Rückfragen"
+  },
+  "summen_labels": {
+    "zwischensumme": "Zwischensumme",
+    "netto": "Nettobetrag",
+    "s35a_netto": "35a EStG), netto",
+    "s35a_brutto": "35a EStG), brutto",
+    "ust": "USt 19",
+    "brutto": "Rechnungsbetrag"
+  },
+  "incomplete_marker": "Entwurf unvollständig",
+  "refusal_marker": "ABLEHNUNG",
+  "nicht_in_quelle": "nicht in Quelle",
+  "cent_tolerance": "0.005"
+}

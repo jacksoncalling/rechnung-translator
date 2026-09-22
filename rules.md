@@ -49,6 +49,7 @@ If the job names a contract that has no file, stop and say so. Do not invent a c
 - One line per distinct activity, or grouped by worker, preserving the concrete description from the work log (§ 14 requires the *Art der Leistung* named concretely, not "Arbeit").
 - Owner hours: sum of all owner hours in the log **(Q)** × Stundensatz from the contract, else pricing **(R)** = line total **(A)**.
 - Helper hours: per named helper, sum of that helper's hours **(Q)** × that helper's billable rate from `team/<helper>.md`, else contract, else pricing **(R)** = line total **(A)**.
+- If a named helper has **no `team/<name>.md` file**, apply the **default helper rate** from `pricing.md` (**R**), flag it, and add a Rückfrage offering to create the file so the worker is on record and can be paid: `David hat noch keine Datei. Ich rechne mit dem Standard-Helfersatz. Lege ich eine Datei an (Verrechnungssatz + interner Lohn)?` The internal wage is for your records and payroll only, never on the invoice.
 - Never sum hours the log did not state. Never apply a rate not found in contract/pricing/team.
 
 ### Leistungen — material
@@ -87,13 +88,18 @@ If the job names a contract that has no file, stop and say so. Do not invent a c
 
 ## 4. Rounding and format
 
-- All money in euros, comma decimal, two places, rounded half up (`48,323 → 48,32`; `147,775 → 147,78`).
+- **Currency is always EUR.** An amount written with no symbol (e.g. `85.40`) is euros. Never ask which currency. All money comma decimal, two places, rounded half up (`48,323 → 48,32`; `147,775 → 147,78`).
 - Round each material line **before** summing; the sum is of the rounded line nets.
 - Hours as written in the log (`1,5`, `0,75`). Never round hours.
 
-## 5. Gaps — the `nicht in Quelle` rule
+## 5. Gaps — ask, do not guess, do not dead-end
 
-If a **required § 14 field** (Rechnungsnummer, Rechnungsdatum, recipient) has no source, print `nicht in Quelle` and add the invoice header note: `Entwurf unvollständig — fehlende Pflichtangabe: <field>`. The invoice is still produced so the person sees exactly what to add. It is never shipped with a filled-in guess.
+A missing field starts a short dialogue. It is not an error, and it is never a place to invent.
+
+- Produce the **best faithful draft** from what is present, with every genuinely missing **required § 14 field** (Rechnungsnummer, Rechnungsdatum, recipient) shown as `nicht in Quelle` and the header note `Entwurf unvollständig`.
+- Then add a **Rückfragen** block: one specific, friendly question per missing field, naming the exact format needed, e.g. `Rechnungsdatum fehlt. An welchem Tag stellst du die Rechnung? (TT.MM.JJJJ)`. The `nicht in Quelle` marker stays for traceability; the question makes it actionable.
+- When the person answers, continue from the draft and finalize. A run may take more than one pass.
+- **Never ask for what is already there or derivable.** Currency is always EUR, so it is never asked (§ 4). The Leistungszeitraum is derived from the work dates, not asked, when dates are present. A redundant question is itself a defect.
 
 ## 6. Nothing dropped — the `Nicht abgebildet` rule
 
@@ -137,5 +143,6 @@ One invented fact and the entry is out. If it is not in the source, the output s
 8. Footer: Gewährleistung, Steuernummer, IBAN
 9. **Quellennachweis**
 10. **Nicht abgebildet**
+11. **Rückfragen** — only when a required field is missing or a worker has no file yet
 
-Same ten, same order, every run.
+Same order every run. Items 1 and 11 appear only when there is something to say. On a complete input the invoice is final in one pass, with no Rückfragen.

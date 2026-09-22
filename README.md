@@ -4,6 +4,8 @@ A folder-based AI translator. It takes **one repair job's raw record** (hours, r
 
 Not a summarizer. Not a writer. A converter with a contract.
 
+It is also a **learning system**. Because the folder is plain language, you and it converge on a shared format: when something is missing it asks a specific question instead of throwing an error, and you can edit any rule to fit how you actually work.
+
 ## Who does this by hand today
 
 Every solo tradesperson and small maintenance operator in Germany. They spend an evening a week turning a notebook page and a shoebox of receipts into an invoice that has to be *exactly right*, because a wrong or missing field means the customer cannot claim the Vorsteuer and sends it back. The conversion is mechanical, hated, and never automated because the last tool that tried it made numbers up.
@@ -46,6 +48,14 @@ input/             a real sample job record you can run
   belege/            receipt photos/scans; read directly, not transcribed
 output/            where finished invoices land
 ```
+
+## Roadmap
+
+This is v1, and it does one thing well: a domestic 19 % repair invoice from a job record. It is built to grow, because real use always exceeds the first use case.
+
+- **Now:** one invoice shape; text or photo receipts; any input language into a German invoice; a dialogue when a field is missing.
+- **Next:** more workers on file; per-job routing (one record, many buildings); the Abschlags-/Schlussrechnung shape; more Bundesländer conventions.
+- **Always:** whatever people feed it that we did not predict. Affordances beat specifications. The contract (nothing invented, everything traced) does not change as the shapes multiply.
 
 ## Note on the data
 

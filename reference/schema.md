@@ -56,12 +56,13 @@ Leistungen
   Fahrtkosten (nur wenn km genannt)
   | km | Satz netto | Gesamt netto |
 
-  Zwischensumme netto            <A>
-  [Vereinbarter Nachlass]        <R, sonst entfällt>
-  Nettobetrag                    <A>
-  davon Arbeits- und Fahrtkosten (§ 35a EStG)  <A: netto / brutto>
-  zzgl. 19 % USt                 <A>
-  Rechnungsbetrag                <A>
+  Zwischensumme netto | <A>
+  [Vereinbarter Nachlass] | <R, sonst entfällt>
+  Nettobetrag | <A>
+  davon Arbeits- und Fahrtkosten (§ 35a EStG), netto | <A>
+  davon Arbeits- und Fahrtkosten (§ 35a EStG), brutto | <A>
+  USt 19 % | <A>
+  Rechnungsbetrag | <A>
 
 Zahlung
   Zahlbar bis <A: Rechnungsdatum + Zahlungsziel | nicht in Quelle>
@@ -77,4 +78,9 @@ Quellennachweis
 
 Nicht abgebildet
   ... Zeilen aus dem Job-Record ohne abrechenbaren Wert, mit Grund ...
+
+Rückfragen (nur bei Entwurf)
+  ... eine Frage je fehlendem Pflichtfeld, im geforderten Format ...
 ```
+
+> Dieses Format liest der Eval (`audit/checks.py`) wörtlich: die Abschnitts-Überschriften (`## Kopf`, `## Arbeitsleistung`, `## Material`, `## Fahrtkosten`, `## Summen`, `## Quellennachweis`, `## Rückfragen`) und die Spaltenköpfe genau so. Weicht die Rechnung ab, scheitert der Prüfer am Parsen statt an der Treue. Der Übersetzer schreibt deshalb exakt diese Form.
