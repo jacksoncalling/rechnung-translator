@@ -25,62 +25,86 @@ Fehlt eine davon, darf der Kunde die Vorsteuer nicht ziehen. Fehlt sie in der Qu
 
 Privatkunden können 20 % der Arbeitskosten (max. 1.200 € / Jahr) absetzen, aber nur wenn die **Arbeits- und Fahrtkosten getrennt vom Material** ausgewiesen sind und unbar gezahlt wurde. Deshalb trägt jede Rechnung die Zeile *davon Arbeits- und Fahrtkosten (§ 35a EStG)*, netto und brutto. Material zählt hier nicht mit.
 
-## Die feste Form
+## Die feste Form — dieses Skelett genau so ausgeben
+
+Das ist ein Formular zum Ausfüllen, keine Beschreibung. **Gib es Zeichen für Zeichen so aus:** dieselben `##`-Überschriften, dieselben Spaltenköpfe, dieselbe Reihenfolge. Fülle die `<...>`-Platzhalter mit Werten, ändere sonst nichts. Nicht umbenennen, nicht umformatieren, nicht einrücken, kein `&nbsp;`, keine `Leistungen`-Klammer.
+
+Weglassen (nur diese): **Fahrtkosten**, wenn keine km genannt sind; **Rückfragen**, wenn die Rechnung vollständig ist; die **Nachlass**-Zeile, wenn der Vertrag keine nennt. Alles andere bleibt stehen, leere Pflichtfelder als `nicht in Quelle`.
 
 ```
-[Kopfnotiz nur wenn unvollständig: "Entwurf unvollständig — fehlende Pflichtangabe: ..."]
+# Rechnung (<Entwurf | final>)
 
-<Betrieb, Inhaber>
-<Anschrift> · <Kontakt>
+<nur bei Entwurf, sonst weglassen:> Entwurf unvollständig — fehlende Pflichtangabe: <Felder, kommagetrennt>
 
-An:
-<Kunde mit Rechtsform>
-<Ansprechpartner>
-<Anschrift>
+<Betrieb, Inhaber — R: stammdaten.md>
+<Anschrift · Kontakt — R: stammdaten.md>
 
-Rechnungsnummer   <BR-JJJJ-NNN | nicht in Quelle>
-Rechnungsdatum    <TT.MM.JJJJ | nicht in Quelle>
-Leistungszeitraum <TT.MM.JJJJ bis TT.MM.JJJJ>
-Bezug             <Vertrag/Auftrag, falls genannt>
+## Kopf
 
-Leistungen
+| Feld | Wert |
+|---|---|
+| Rechnungsnummer | <BR-JJJJ-NNN | nicht in Quelle> |
+| Rechnungsdatum | <TT.MM.JJJJ | nicht in Quelle> |
+| Leistungszeitraum | <TT.MM.JJJJ bis TT.MM.JJJJ | nicht in Quelle> |
+| Empfänger | <Kunde mit Rechtsform — R: contracts/ | nicht in Quelle> |
+| Bezug | <Vertrag/Auftrag | nicht in Quelle> |
 
-  Arbeitsleistung
-  | Leistung (konkret) | Std | Satz netto | Gesamt netto |
-  ... Inhaber, dann je Helfer ...
+## Arbeitsleistung
 
-  Material
-  | Position | Einkauf | Aufschlag | Gesamt netto |
-  ... eine Zeile je Beleg; Aufschlag als gezeigte Rechnung ...
+| Leistung | Wer | Std | Satz netto | Gesamt netto |
+|---|---|---|---|---|
+| <konkrete Leistung> | <Inhaber / Helfername> | <x,x> | <x,xx> € | <x,xx> € |
 
-  Fahrtkosten (nur wenn km genannt)
-  | km | Satz netto | Gesamt netto |
+## Material
 
-  Zwischensumme netto | <A>
-  [Vereinbarter Nachlass] | <R, sonst entfällt>
-  Nettobetrag | <A>
-  davon Arbeits- und Fahrtkosten (§ 35a EStG), netto | <A>
-  davon Arbeits- und Fahrtkosten (§ 35a EStG), brutto | <A>
-  USt 19 % | <A>
-  Rechnungsbetrag | <A>
+| Position | Einkauf | Aufschlag | Gesamt netto |
+|---|---|---|---|
+| <Position laut Beleg> | <x,xx> € | ×1,15 | <x,xx> € |
 
-Zahlung
-  Zahlbar bis <A: Rechnungsdatum + Zahlungsziel | nicht in Quelle>
-  Kontoinhaber / IBAN            <R>
-  Verwendungszweck               <Q: Rechnungsnummer>
+## Fahrtkosten
 
-Gewährleistung                   <R, Vertrag>
-Steuernummer / IBAN              <R>
+| km | Satz netto | Gesamt netto |
+|---|---|---|
+| <x> | 0,50 € | <x,xx> € |
 
-Quellennachweis
-  | Wert | Tag | Quelle |
-  ... eine Zeile je Ausgabewert ...
+## Summen
 
-Nicht abgebildet
-  ... Zeilen aus dem Job-Record ohne abrechenbaren Wert, mit Grund ...
+| Posten | Betrag |
+|---|---|
+| Zwischensumme netto | <x,xx> € |
+| Vereinbarter Nachlass | <− x,xx € — nur wenn im Vertrag> |
+| Nettobetrag | <x,xx> € |
+| davon Arbeits- und Fahrtkosten (§ 35a EStG), netto | <x,xx> € |
+| davon Arbeits- und Fahrtkosten (§ 35a EStG), brutto | <x,xx> € |
+| USt 19 % | <x,xx> € |
+| Rechnungsbetrag | <x,xx> € |
 
-Rückfragen (nur bei Entwurf)
-  ... eine Frage je fehlendem Pflichtfeld, im geforderten Format ...
+## Zahlung
+
+| Feld | Wert |
+|---|---|
+| Zahlungsziel | <N Tage — R: Vertrag | nicht in Quelle> |
+| Fällig | <TT.MM.JJJJ | nicht in Quelle> |
+| Kontoinhaber | <R: stammdaten.md> |
+| IBAN | <R: stammdaten.md> |
+| Verwendungszweck | <BR-JJJJ-NNN | nicht in Quelle> |
+
+Gewährleistung: <Vertragstext | nicht in Quelle>
+Steuernummer <R: stammdaten.md> · IBAN <R: stammdaten.md>
+
+## Quellennachweis
+
+| Wert | Tag | Quelle |
+|---|---|---|
+| <Betrag/Name/Datum> | <Q / R / A / ∅> | <Input-Zeile, reference-Datei, oder Formel mit Zahlen> |
+
+## Nicht abgebildet
+
+- <Zeile aus dem Job-Record ohne abrechenbaren Wert, mit knappem Grund>
+
+## Rückfragen
+
+- <nur bei Entwurf: ein fehlendes Feld je Zeile, Feldname + Format, eine Zeile, keine Erklärung>
 ```
 
-> Dieses Format liest der Eval (`audit/checks.py`) wörtlich: die Abschnitts-Überschriften (`## Kopf`, `## Arbeitsleistung`, `## Material`, `## Fahrtkosten`, `## Summen`, `## Quellennachweis`, `## Rückfragen`) und die Spaltenköpfe genau so. Weicht die Rechnung ab, scheitert der Prüfer am Parsen statt an der Treue. Der Übersetzer schreibt deshalb exakt diese Form.
+> Der Eval (`audit/checks.py`) liest genau dieses Skelett. Weicht die Rechnung im Aufbau ab, scheitert der Prüfer am Parsen statt an der Treue, und derselbe Job käme in zwei Läufen unterschiedlich heraus. Gleiche Form bei jedem Lauf ist die halbe Aufgabe. Deshalb: dieses Skelett, wörtlich.

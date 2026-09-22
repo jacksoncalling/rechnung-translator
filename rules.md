@@ -4,6 +4,22 @@ How the translator maps a job record to a Rechnung. This is the contract. When i
 
 ---
 
+## 0. Run flow — read only what the conversion needs
+
+To convert one job record, read exactly these, then produce the invoice:
+
+- `identity.md` and `rules.md` (this file)
+- `reference/schema.md` (the output format)
+- `reference/pricing.md` (default rates, EUR)
+- the **one** contract named in the job: `reference/contracts/<name>.md` (not the others)
+- any helper named in the job: `reference/team/<name>.md` (only those)
+- `reference/beleg-lesen.md` **only** if a receipt image is attached
+- `reference/out-of-scope.md` **only** if a refusal trigger fires (§ 8)
+
+Do not read anything else: not `audit/` (ever), not `examples.md`, not the `_vorlage` templates, not the other contracts, and not `input/` or `output/` (the job record is in the user's message; `output/` holds only past results). The refusal triggers are listed in § 8, so you do not need to open a file to detect them. Read the short set above and go.
+
+---
+
 ## 1. The provenance tags
 
 Every single value that appears in the output carries exactly one origin. Nothing may appear without one.
@@ -97,7 +113,8 @@ If the job names a contract that has no file, stop and say so. Do not invent a c
 A missing field starts a short dialogue. It is not an error, and it is never a place to invent.
 
 - Produce the **best faithful draft** from what is present, with every genuinely missing **required § 14 field** (Rechnungsnummer, Rechnungsdatum, recipient) shown as `nicht in Quelle` and the header note `Entwurf unvollständig`.
-- Then add a **Rückfragen** block: one specific, friendly question per missing field, naming the exact format needed, e.g. `Rechnungsdatum fehlt. An welchem Tag stellst du die Rechnung? (TT.MM.JJJJ)`. The `nicht in Quelle` marker stays for traceability; the question makes it actionable.
+- Then add a **Rückfragen** block. Each Rückfrage is **one line**: the field and the format needed, nothing more. No justification, no reasoning, no comment on the work. `Rechnungsnummer? (BR-JJJJ-NNN)` · `Rechnungsdatum? (TT.MM.JJJJ)` · `Welcher Vertrag/Kunde?`. The `nicht in Quelle` marker stays for traceability; the one-liner makes it actionable.
+- **Ask only for missing data. Never editorialise.** The translator does not weigh in on whether the work fits the contract, whether an item should be billed, or anything else. That is judgment, and judgment is not its job. If a fact is missing, name it; do not argue about it.
 - When the person answers, continue from the draft and finalize. A run may take more than one pass.
 - **Never ask for what is already there or derivable.** Currency is always EUR, so it is never asked (§ 4). The Leistungszeitraum is derived from the work dates, not asked, when dates are present. A redundant question is itself a defect.
 
@@ -146,3 +163,5 @@ One invented fact and the entry is out. If it is not in the source, the output s
 11. **Rückfragen** — only when a required field is missing or a worker has no file yet
 
 Same order every run. Items 1 and 11 appear only when there is something to say. On a complete input the invoice is final in one pass, with no Rückfragen.
+
+**Reproduce the exact skeleton in `reference/schema.md` verbatim**: the same `##` headings, the same table columns, the same order. Do not restyle, rename, indent, or pad with `&nbsp;`. Two runs of the same job must come out identical in shape. That is what makes the output scoreable and what stops it from being a summarizer.
