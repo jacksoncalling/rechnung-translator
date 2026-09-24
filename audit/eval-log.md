@@ -93,6 +93,56 @@ The checker was changed after seeing the results. That deserves naming, because 
 
 ---
 
+## Round 3 — 2026-09-24, fresh cold round against the fixed schema
+
+Round 2 only re-scored existing artifacts, so it proved the checker fix and not the schema fix. Three fresh agents were given the same three voice notes again.
+
+**The narrow test.** Round 1 produced three different issuer lines. Round 3 produced one, byte-identical across all three runs:
+
+```
+04-plumbing  'Berg Reparatur- und Hausmeisterservice \xb7 Jonas Berg'
+05-drywall   'Berg Reparatur- und Hausmeisterservice \xb7 Jonas Berg'
+06-flooring  'Berg Reparatur- und Hausmeisterservice \xb7 Jonas Berg'
+```
+
+The pinned schema form held. That fix is now demonstrated, not asserted.
+
+**Full suite:**
+
+```
+| 01-clean-complete.report.html    | PASS | PASS | ok |
+| 02-missing-fields.report.html    | PASS | PASS | ok |
+| 03-english-helper.report.html    | PASS | PASS | ok |
+| 04-plumbing.report.html          | PASS | PASS | ok |
+| 05-drywall.report.html           | PASS | PASS | ok |
+| 06-flooring.report.html          | PASS | PASS | ok |
+| planted-defect.report.md         | FAIL | FAIL | ok |
+| planted-html-tamper.report.html  | FAIL | FAIL | ok |
+
+**Suite: PASS**
+```
+
+All three cold runs passed `shape`, `dialogue` and `key-match`, hitting the Brutto frozen before round 1.
+
+### What round 3 exposed
+
+The invoice content is now stable, but the **output filename is not**. The same three jobs across two rounds:
+
+| job | round 1 | round 3 |
+|---|---|---|
+| 4B | `apartment-4b-plumbing-draft.html` | `wohnung-4b-kueche-entwurf.html` |
+| Oak Street | `entwurf-oakstreet-2026-09-24.html` | `entwurf-oak-street-2026-09-24.html` |
+| unit 12 | `entwurf-einheit-12-boden.html` | `entwurf-einheit12-boden-20260924.html` |
+
+English versus German, different hyphenation, date present or absent, and two date formats. `rules.md` said only `output/<unique-name>.html`, which pins nothing. Fixed by naming the file in `reference/schema.md` and `rules.md` § 10:
+
+- draft: `entwurf_<kunde-slug>_<job-slug>.html`, or `entwurf_kunde-offen_<job-slug>.html` when no contract is named
+- final: `<rechnungsnummer>_<kunde-slug>_<rechnungsdatum>.html`
+
+Lowercase, German, hyphens inside a part, underscores between parts, ISO dates.
+
+---
+
 ## Open
 
-The schema's pinned issuer form has not yet been exercised by a fresh cold run. Round 2 re-scored existing artifacts, which proves the checker fix and not the schema fix. A further cold round is needed to show three fresh agents now produce the same issuer line.
+The filename convention is pinned but not yet exercised by a fresh cold run. Same status the issuer form had before round 3: fixed, unproven. A fourth round would close it.

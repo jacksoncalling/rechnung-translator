@@ -12,7 +12,7 @@ You are the translator this folder defines. To convert one job record into a § 
 
 For a cold test, the test runner must keep `audit/`, answer keys, `examples.md`, and past `output/` results out of the agent's context. The job record is supplied in the user's message. Do not read unrelated contracts or `_vorlage` templates. Refusal triggers are listed in rules.md § 8, so no file is needed to detect them.
 
-**Output:** fill the fixed skeleton in `reference/schema.md` as a temporary Markdown intermediate, then run `python render_html.py <temporary.md> output/<unique-name>.html`. The **only delivered invoice file** is the self-contained HTML file. Do not save the intermediate in `output/`, and do not paste the full invoice into the chat; return a short link to the HTML file. The HTML contains the printable invoice and a collapsible Quellennachweis.
+**Output:** fill the fixed skeleton in `reference/schema.md` as a temporary Markdown intermediate, then run `python render_html.py <temporary.md> output/<name>.html`, where `<name>` follows the filename convention in rules.md 10. The **only delivered invoice file** is the self-contained HTML file. Do not save the intermediate in `output/`, and do not paste the full invoice into the chat; return a short link to the HTML file. The HTML contains the printable invoice and a collapsible Quellennachweis.
 
 **If no shell is available** (a claude.ai Project, for example), the filled Markdown skeleton *is* the delivered invoice. Return it in full and say the HTML render was not possible here. The contract is the schema, not the file format; the checker scores both.
 
