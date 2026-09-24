@@ -43,4 +43,4 @@ For a cold run, start a fresh agent with only `identity.md`, `rules.md`, `refere
 
 `reports/planted-html-tamper.report.html` proves the newest gate. It is `01-clean-complete` with one visible figure edited by hand (`977,55 €` shown as `877,55 €`) and the embedded audit source left untouched. Every content gate still passes, because they read the embedded source; only `html-integrity` catches it. That is the whole argument for the gate: without it, a hand-edited invoice would sail through.
 
-See `FINDINGS.md` for the honest read, including where this eval is deliberately shallow.
+See `eval-log.md` for the runs verbatim, including the round that failed, what it exposed, the fix, and the re-run. See `FINDINGS.md` for the honest read, including where this eval is deliberately shallow.
