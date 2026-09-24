@@ -4,6 +4,10 @@ A folder-based AI translator. It takes **one repair job's raw record** (hours, r
 
 Not a summarizer. Not a writer. A converter with a contract.
 
+## Watch it (60 seconds)
+
+A silent one-minute film of one real job going in and a finished invoice coming out: [youtu.be/B0Egs0SIAEM](https://youtu.be/B0Egs0SIAEM). The coffee machine the Handwerker only glanced at never lands on the bill, and every number traces to a source.
+
 It is also a **learning system**. Because the folder is plain language, you and it converge on a shared format: when something is missing it asks a specific question instead of throwing an error, and you can edit any rule to fit how you actually work.
 
 ## Who does this by hand today
