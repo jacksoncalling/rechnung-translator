@@ -10,13 +10,14 @@ To convert one job record, read exactly these, then produce the invoice:
 
 - `identity.md` and `rules.md` (this file)
 - `reference/schema.md` (the output format)
+- `reference/stammdaten.md` (issuer identity and payment details)
 - `reference/pricing.md` (default rates, EUR)
 - the **one** contract named in the job: `reference/contracts/<name>.md` (not the others)
 - any helper named in the job: `reference/team/<name>.md` (only those)
 - `reference/beleg-lesen.md` **only** if a receipt image is attached
 - `reference/out-of-scope.md` **only** if a refusal trigger fires (§ 8)
 
-Do not read anything else: not `audit/` (ever), not `examples.md`, not the `_vorlage` templates, not the other contracts, and not `input/` or `output/` (the job record is in the user's message; `output/` holds only past results). The refusal triggers are listed in § 8, so you do not need to open a file to detect them. Read the short set above and go.
+The job record is supplied in the user's message. Do not read unrelated contracts or `_vorlage` templates. During a cold test, the test runner keeps `audit/`, answer keys, `examples.md`, and past `output/` results out of the agent's context. The refusal triggers are listed in § 8, so you do not need to open a file to detect them.
 
 ---
 
@@ -73,11 +74,13 @@ If the job names a contract that has no file, stop and say so. Do not invent a c
 - One line per receipt. Description and purchase amount are **Q**.
 - Line net = purchase amount **(Q)** × (1 + Materialaufschlag **(R)**), shown as **(A)**: `Einkauf X,XX € × 1,NN = Y,YY €`.
 - If a receipt's amount is not stated, not readable, or only partly legible, the line stays, the amount is `nicht in Quelle` / `nicht sicher lesbar`, and it is **excluded from every sum** and flagged. Never estimate a material cost, and never guess a smudged digit into a plausible one.
+- If the text gives a purchase amount without saying whether it is net or gross, ask which it is before applying the markup. Keep the material line unresolved and exclude it from sums until answered.
 
 ### Leistungen — travel
-- Only if the job record states kilometers or a countable trip distance.
-- Fahrtkosten = total km **(Q)** × €/km **(R, contract else pricing)** = **(A)**.
-- If the record only says the work happened elsewhere but states no distance, there is **no travel line**. `nicht in Quelle` for distance. Never derive km from an address, a map, or "drove there."
+- Add a travel line only for kilometers explicitly recorded for the job. Fahrtkosten = recorded km **(Q)** × €/km **(R, contract else pricing)** = **(A)**.
+- Use the recorded distance exactly once. Do not double an `Anfahrt` value to assume a return journey, and do not add a trip to a supplier unless that trip and its kilometers are explicitly recorded. Never derive kilometers from an address or map.
+- If the record says someone drove for this job but gives no kilometers, leave out the travel line, mark the distance `nicht in Quelle` in the Quellennachweis, and keep the invoice as an **Entwurf**. Ask one short question: `Fahrt: gefahrene Kilometer? (km) Oder nicht berechnen?` Do not ask for kilometers when no trip is mentioned.
+- If the person supplies kilometers, calculate the travel line. If they confirm `nicht berechnen`, omit the travel line, record that decision under `Nicht abgebildet`, and finalize when no other gaps remain. Do not invent a zero-kilometer trip.
 
 ### Sums
 | Field | Source | Rule |
@@ -112,10 +115,10 @@ If the job names a contract that has no file, stop and say so. Do not invent a c
 
 A missing field starts a short dialogue. It is not an error, and it is never a place to invent.
 
-- Produce the **best faithful draft** from what is present, with every genuinely missing **required § 14 field** (Rechnungsnummer, Rechnungsdatum, recipient) shown as `nicht in Quelle` and the header note `Entwurf unvollständig`.
+- Produce the **best faithful draft** from what is present, with every missing required field, unresolved billable amount, or mentioned trip with no distance/waiver shown as `nicht in Quelle` (or `nicht sicher lesbar`) and the header note `Entwurf unvollständig`. Do not label a partial sum as the final invoice amount.
 - Then add a **Rückfragen** block. Each Rückfrage is **one line**: the field and the format needed, nothing more. No justification, no reasoning, no comment on the work. `Rechnungsnummer? (BR-JJJJ-NNN)` · `Rechnungsdatum? (TT.MM.JJJJ)` · `Welcher Vertrag/Kunde?`. The `nicht in Quelle` marker stays for traceability; the one-liner makes it actionable.
 - **Ask only for missing data. Never editorialise.** The translator does not weigh in on whether the work fits the contract, whether an item should be billed, or anything else. That is judgment, and judgment is not its job. If a fact is missing, name it; do not argue about it.
-- When the person answers, continue from the draft and finalize. A run may take more than one pass.
+- When the person answers, continue from the draft and finalize only when the required fields, billable amounts, and mentioned trips are resolved. A run may take more than one pass.
 - **Never ask for what is already there or derivable.** Currency is always EUR, so it is never asked (§ 4). The Leistungszeitraum is derived from the work dates, not asked, when dates are present. A redundant question is itself a defect.
 
 ## 6. Nothing dropped — the `Nicht abgebildet` rule
@@ -160,8 +163,8 @@ One invented fact and the entry is out. If it is not in the source, the output s
 8. Footer: Gewährleistung, Steuernummer, IBAN
 9. **Quellennachweis**
 10. **Nicht abgebildet**
-11. **Rückfragen** — only when a required field is missing or a worker has no file yet
+11. **Rückfragen** — only when a required field, billable amount, or mentioned trip is unresolved, or a worker has no file yet
 
 Same order every run. Items 1 and 11 appear only when there is something to say. On a complete input the invoice is final in one pass, with no Rückfragen.
 
-**Reproduce the exact skeleton in `reference/schema.md` verbatim**: the same `##` headings, the same table columns, the same order. Do not restyle, rename, indent, or pad with `&nbsp;`. Two runs of the same job must come out identical in shape. That is what makes the output scoreable and what stops it from being a summarizer.
+**Reproduce the exact skeleton in `reference/schema.md` as a temporary intermediate**: the same `##` headings, table columns, and order. Render it with `python render_html.py <temporary.md> output/<unique-name>.html`. Save no Markdown invoice in `output/`; the one delivered file is HTML. **Where no shell exists** (a claude.ai Project, for example), the filled skeleton itself is the delivered invoice: return it in full and say the render was not possible. The schema is the contract; HTML is the preferred carrier, not the contract itself. Do not retype or recalculate the invoice in HTML. The renderer puts the Quellennachweis in a collapsible section and hides it when printing. Return only a short file link and the unresolved Rückfragen, if any, in chat. Use the invoice number in a final filename; use a distinct job identifier for a draft so a second draft on the same day cannot overwrite it. Two runs of the same job must keep the same data shape.

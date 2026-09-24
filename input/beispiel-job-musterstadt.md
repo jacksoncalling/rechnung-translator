@@ -20,9 +20,9 @@ Rechnungsdatum: 22.09.2026
 - Anfahrt 18 km.
 
 ## Material (Belege)
-- Baumarkt, 08.09.: Dichtungssortiment und Öl. 42,02 €
-- Farbenhaus, 10.09.: 2,5 L Holzlack und Pinsel. 63,80 €
-- Beschlag-Handel, 12.09.: drei Fensterbänke, Zuschnitt. 128,50 €
+- Baumarkt, 08.09.: Dichtungssortiment und Öl. Einkauf netto 42,02 €
+- Farbenhaus, 10.09.: 2,5 L Holzlack und Pinsel. Einkauf netto 63,80 €
+- Beschlag-Handel, 12.09.: drei Fensterbänke, Zuschnitt. Einkauf netto 128,50 €
 
 ## Notizen
 - Kaffeemaschine im Gemeinschaftsraum läuft nicht. Nur angeschaut, nichts gemacht.

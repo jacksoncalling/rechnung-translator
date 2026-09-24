@@ -3,8 +3,17 @@
   "reference_dir": "../reference",
   "vat_rate": "0.19",
   "material_markup": "0.15",
-  "tags": ["Q", "R", "A", "∅"],
-  "required_fields": ["Rechnungsnummer", "Rechnungsdatum", "Empfänger"],
+  "tags": [
+    "Q",
+    "R",
+    "A",
+    "∅"
+  ],
+  "required_fields": [
+    "Rechnungsnummer",
+    "Rechnungsdatum",
+    "Empfänger"
+  ],
   "sections": {
     "kopf": "## Kopf",
     "arbeit": "## Arbeitsleistung",
@@ -27,5 +36,13 @@
   "incomplete_marker": "Entwurf unvollständig",
   "refusal_marker": "ABLEHNUNG",
   "nicht_in_quelle": "nicht in Quelle",
-  "cent_tolerance": "0.005"
+  "cent_tolerance": "0.005",
+  "required_field_synonyms": {
+    "Empfänger": [
+      "Empfänger",
+      "Kunde",
+      "Vertrag",
+      "Auftraggeber"
+    ]
+  }
 }

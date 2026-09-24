@@ -5,7 +5,7 @@ zweck: Die feste Rechnungsform und die Pflichtangaben nach § 14 UStG.
 
 # Rechnungs-Schema
 
-Die feste Ausgabeform. Jede Rechnung hat genau diese Abschnitte, in dieser Reihenfolge. Jedes Feld nennt seinen rechtlichen Grund.
+Die feste Datenform. Jede Rechnung hat genau diese Abschnitte, in dieser Reihenfolge. Dieses Markdown ist ein **Zwischenschritt** für `render_html.py`; die einzige ausgelieferte Rechnungsdatei ist ein eigenständiges, druckbares HTML. Jedes Feld nennt seinen rechtlichen Grund.
 
 ## Pflichtangaben nach § 14 UStG
 
@@ -29,15 +29,17 @@ Privatkunden können 20 % der Arbeitskosten (max. 1.200 € / Jahr) absetzen, ab
 
 Das ist ein Formular zum Ausfüllen, keine Beschreibung. **Gib es Zeichen für Zeichen so aus:** dieselben `##`-Überschriften, dieselben Spaltenköpfe, dieselbe Reihenfolge. Fülle die `<...>`-Platzhalter mit Werten, ändere sonst nichts. Nicht umbenennen, nicht umformatieren, nicht einrücken, kein `&nbsp;`, keine `Leistungen`-Klammer.
 
-Weglassen (nur diese): **Fahrtkosten**, wenn keine km genannt sind; **Rückfragen**, wenn die Rechnung vollständig ist; die **Nachlass**-Zeile, wenn der Vertrag keine nennt. Alles andere bleibt stehen, leere Pflichtfelder als `nicht in Quelle`.
+Die beiden Ausstellerzeilen kommen aus `stammdaten.md` und stehen genau so, mit `·` als Trenner, direkt vor `## Kopf`.
+
+Weglassen (nur diese): **Fahrtkosten**, wenn keine km genannt sind; **Rückfragen**, wenn die Rechnung vollständig ist; die **Nachlass**-Zeile, wenn der Vertrag keine nennt. Alles andere bleibt stehen. Wenn keine Materialposition genannt ist, bleibt die Materialtabelle ohne Datenzeile. In `Nicht abgebildet` steht `- nichts`, wenn nichts offen ist. Fehlende Werte stehen als `nicht in Quelle`. Solange eine abrechenbare Position oder eine im Job erwähnte Fahrt ohne Kilometerangabe bzw. ausdrücklichen Verzicht ungeklärt ist, bleibt die Ausgabe ein Entwurf; die gezeigten Summen sind nur die Summe der gesicherten Positionen.
 
 ```
 # Rechnung (<Entwurf | final>)
 
-<nur bei Entwurf, sonst weglassen:> Entwurf unvollständig — fehlende Pflichtangabe: <Felder, kommagetrennt>
+<nur bei Entwurf, sonst weglassen:> Entwurf unvollständig — offen: <Felder oder Positionen, kommagetrennt>
 
-<Betrieb, Inhaber — R: stammdaten.md>
-<Anschrift · Kontakt — R: stammdaten.md>
+<Betrieb> · <Inhaber>
+<Anschrift> · <E-Mail> · <Telefon>
 
 ## Kopf
 
@@ -107,4 +109,4 @@ Steuernummer <R: stammdaten.md> · IBAN <R: stammdaten.md>
 - <nur bei Entwurf: ein fehlendes Feld je Zeile, Feldname + Format, eine Zeile, keine Erklärung>
 ```
 
-> Der Eval (`audit/checks.py`) liest genau dieses Skelett. Weicht die Rechnung im Aufbau ab, scheitert der Prüfer am Parsen statt an der Treue, und derselbe Job käme in zwei Läufen unterschiedlich heraus. Gleiche Form bei jedem Lauf ist die halbe Aufgabe. Deshalb: dieses Skelett, wörtlich.
+> `render_html.py` erzeugt aus diesem Skelett die HTML-Vorlage mit Druckansicht und einklappbarem Quellennachweis. Der Eval (`audit/checks.py`) prüft, dass die sichtbare HTML-Rechnung genau aus dem eingebetteten Zwischenschritt gerendert wurde, und prüft dann Form und Rechenwerte. Das Zwischen-Markdown nicht als zweite Ausgabedatei in `output/` ablegen. Steht keine Shell zur Verfügung (z. B. ein claude.ai-Project), ist das ausgefüllte Skelett selbst die gelieferte Rechnung: dann vollständig ausgeben und den fehlenden Render benennen. Der Prüfer liest beide Formate.

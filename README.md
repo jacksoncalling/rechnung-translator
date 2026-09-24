@@ -22,7 +22,7 @@ Every invoice ends with a **Quellennachweis**: one row per output value, tagged 
 
 1. Drop this folder into a Claude project.
 2. Feed it a job record shaped like [`input/beispiel-job-musterstadt.md`](input/beispiel-job-musterstadt.md). Receipts can be **described in text**, or dropped in as **photos / scans** in `input/belege/`. The translator reads the image directly and refuses to guess an unreadable digit (see [`reference/beleg-lesen.md`](reference/beleg-lesen.md)).
-3. Get back a finished Rechnung plus its Quellennachweis. It lands in `output/`.
+3. Get back one printable, self-contained HTML invoice in `output/`. Open it in a browser, use **Drucken / als PDF speichern** to print or save a PDF, and expand the Quellennachweis when you want to inspect the sources. Drafts show their Rückfragen on screen.
 
 The instruction to Claude: *"You are the translator defined by `identity.md` and `rules.md`. Convert the job record I give you into a Rechnung. Follow the contract exactly."*
 
@@ -35,9 +35,9 @@ One invoice shape only: **standard domestic, full service, 19 % USt.** If the in
 ```
 identity.md        what it converts, from what, to what
 rules.md           the mapping: input part to invoice field, provenance, gaps, refusals
-examples.md        three input/output pairs showing the contract hold, break gracefully, and refuse
+examples.md        three input/output pairs: complete, incomplete, and English job notes
 reference/         the contract this folder promises to keep
-  schema.md          the fixed invoice shape + the § 14 UStG field definitions
+  schema.md          the fixed invoice data shape + the § 14 UStG field definitions
   stammdaten.md      the issuer's identity (pseudonymized)
   pricing.md         default rates: labor, helper, travel, material markup, VAT
   out-of-scope.md    what the translator refuses and why
@@ -46,7 +46,8 @@ reference/         the contract this folder promises to keep
   beleg-lesen.md     how to read a receipt photo/scan without inventing a digit
 input/             a real sample job record you can run
   belege/            receipt photos/scans; read directly, not transcribed
-output/            where finished invoices land
+render_html.py      fixed HTML template and print styling
+output/             one HTML file per invoice or draft; older Markdown runs are legacy examples
 ```
 
 ## Roadmap

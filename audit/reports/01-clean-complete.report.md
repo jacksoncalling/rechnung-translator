@@ -1,5 +1,8 @@
 # Rechnung (final)
 
+Berg Reparatur- und Hausmeisterservice · Jonas Berg
+Beispielweg 12, 52070 Aachen · jonas@berg-reparatur.example · +49 000 0000000
+
 ## Kopf
 
 | Feld | Wert |
@@ -7,7 +10,8 @@
 | Rechnungsnummer | BR-2026-014 |
 | Rechnungsdatum | 22.09.2026 |
 | Leistungszeitraum | 08.09.2026 bis 12.09.2026 |
-| Empfänger | Wohnbaugenossenschaft Musterstadt eG |
+| Empfänger | Wohnbaugenossenschaft Musterstadt eG · z. Hd. Frau Hartmann, Technik · Genossenschaftsplatz 1, 45000 Musterstadt |
+| Bezug | Rahmenauftrag Instandhaltung 2026 (WG-Musterstadt) |
 
 ## Arbeitsleistung
 
@@ -55,6 +59,9 @@
 | IBAN | DE00 0000 0000 0000 0000 00 |
 | Verwendungszweck | BR-2026-014 |
 
+Gewährleistung: 2 Jahre ab Abnahme (§ 634a Abs. 1 Nr. 3 BGB)
+Steuernummer 201/1234/5678 · IBAN DE00 0000 0000 0000 0000 00
+
 ## Quellennachweis
 
 | Wert | Tag | Quelle |
@@ -62,6 +69,10 @@
 | BR-2026-014 | Q | Input, Zeile "Rechnungsnummer" |
 | 22.09.2026 | Q | Input, Zeile "Rechnungsdatum" |
 | Empfänger, Anschrift | R | reference/contracts/musterstadt-eg.md |
+| Betrieb, Inhaber, Anschrift, Kontakt | R | reference/stammdaten.md |
+| Bezug, Gewährleistung, Zahlungsziel | R | reference/contracts/musterstadt-eg.md |
+| Steuernummer, Kontoinhaber, IBAN | R | reference/stammdaten.md |
+| 08.09.2026 bis 12.09.2026 | A | min/max der Arbeitstage 08.09., 10.09., 12.09.2026 |
 | 1,5 Std | Q | Input, "1,5 Std" (Wasserhahn) |
 | 60,00 € Satz | R | reference/contracts/musterstadt-eg.md |
 | 90,00 € | A | 1,5 × 60,00 |
@@ -89,6 +100,7 @@
 | 656,88 € | A | 552,00 × 1,19 |
 | 156,08 € | A | 821,47 × 0,19 |
 | 977,55 € | A | 821,47 + 156,08 |
+| 06.10.2026 | A | 22.09.2026 + 14 Tage |
 
 ## Nicht abgebildet
 

@@ -1,0 +1,14 @@
+# Editor and OS noise. Never part of the method.
+.obsidian/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# output/ is the landing zone for real runs, not evidence.
+# Committed proof lives in audit/reports/. Real invoices live in HQ, never here.
+output/*
+!output/README.md

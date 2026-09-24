@@ -31,8 +31,11 @@ Usage:
   python checks.py --all
 Exit 0 if every hard gate passes, 1 otherwise.
 """
-import sys, os, re, json, argparse
+import sys, os, re, json, argparse, base64
 from decimal import Decimal, ROUND_HALF_UP
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from render_html import render as render_invoice_html
 
 # ---------- helpers ----------
 
@@ -147,6 +150,19 @@ def evaluate(report_path, input_path, key_path, conv, base):
     text = read_text(report_path)
     tol = float(conv["cent_tolerance"])
     gates = []   # (name, ok, detail)
+    if report_path.lower().endswith(".html"):
+        encoded = re.search(r'<script id="audit-source" type="text/plain">([A-Za-z0-9+/=]+)</script>', text)
+        if not encoded:
+            return False, [("html-integrity", False, "eingebettete Prüfquelle fehlt")], {}
+        try:
+            source = base64.b64decode(encoded.group(1), validate=True).decode("utf-8")
+            intact = render_invoice_html(source) == text
+        except (ValueError, UnicodeError):
+            return False, [("html-integrity", False, "HTML oder Prüfquelle ungültig")], {}
+        gates.append(("html-integrity", intact,
+                      "sichtbare Rechnung entspricht der Prüfquelle" if intact
+                      else "HTML wurde nach dem Rendern verändert"))
+        text = source
 
     # ----- refusal short-circuit -----
     if conv["refusal_marker"] in text:
@@ -160,12 +176,59 @@ def evaluate(report_path, input_path, key_path, conv, base):
     sec = sections(text, conv)
     incomplete = conv["incomplete_marker"] in text
 
-    # ----- G shape -----
-    need = ["arbeit", "summen", "quellennachweis"]
-    missing_sec = [conv["sections"][k] for k in need if not sec[k].strip()]
-    gates.append(("shape", not missing_sec,
-                  "Pflichtabschnitte vorhanden" if not missing_sec
-                  else f"fehlend: {missing_sec}"))
+    # ----- G shape: enforce the declared skeleton, not merely three sections -----
+    headings = re.findall(r'^## .+$', text, re.M)
+    expected = [conv["sections"][k] for k in
+                ("kopf", "arbeit", "material", "fahrt", "summen", "zahlung",
+                 "quellennachweis", "nicht_abgebildet", "rueckfragen")]
+    expected = [h for h in expected if h != conv["sections"]["fahrt"] or "## Fahrtkosten" in headings]
+    expected = [h for h in expected if h != conv["sections"]["rueckfragen"] or incomplete]
+    missing_sec = [h for h in expected if h not in headings]
+    shape_errors = []
+    if missing_sec:
+        shape_errors.append(f"fehlend: {missing_sec}")
+    if headings != expected:
+        shape_errors.append("Abschnittsfolge weicht vom Schema ab")
+    if not re.match(r'^# Rechnung \((?:Entwurf|final)\)', text):
+        shape_errors.append("Rechnungstitel fehlt")
+    if not re.search(r'^Gewährleistung: .+', text, re.M) or not re.search(r'^Steuernummer .+ · IBAN .+', text, re.M):
+        shape_errors.append("Abschluss mit Gewährleistung/Steuernummer/IBAN fehlt")
+    # Structural, not typographic: two non-empty lines directly before ## Kopf.
+    # render_html.py enforces the same rule. Separator style is schema guidance,
+    # not a fidelity property, so it must not fail an otherwise faithful invoice.
+    cut = text.find("\n## Kopf")
+    intro = [l for l in text[:cut].splitlines()[1:] if l.strip()] if cut > 0 else []
+    issuer = [l for l in intro if not l.startswith(conv["incomplete_marker"])]
+    if len(issuer) != 2:
+        shape_errors.append("Ausstellerblock fehlt (zwei Zeilen vor ## Kopf erwartet)")
+    required_rows = {
+        "kopf": ["Rechnungsnummer", "Rechnungsdatum", "Leistungszeitraum", "Empfänger", "Bezug"],
+        "summen": ["Zwischensumme netto", "Nettobetrag", "davon Arbeits- und Fahrtkosten (§ 35a EStG), netto", "davon Arbeits- und Fahrtkosten (§ 35a EStG), brutto", "USt 19 %", "Rechnungsbetrag"],
+        "zahlung": ["Zahlungsziel", "Fällig", "Kontoinhaber", "IBAN", "Verwendungszweck"],
+    }
+    for section, labels in required_rows.items():
+        found = [r[0] for r in rows(sec[section]) if r]
+        if not all(label in found for label in labels):
+            shape_errors.append(f"{section}: Pflichtzeilen fehlen")
+        elif [found.index(label) for label in labels] != sorted(found.index(label) for label in labels):
+            shape_errors.append(f"{section}: Pflichtzeilen in falscher Reihenfolge")
+    table_headers = {
+        "kopf": "| Feld | Wert |",
+        "arbeit": "| Leistung | Wer | Std | Satz netto | Gesamt netto |",
+        "material": "| Position | Einkauf | Aufschlag | Gesamt netto |",
+        "fahrt": "| km | Satz netto | Gesamt netto |",
+        "summen": "| Posten | Betrag |",
+        "zahlung": "| Feld | Wert |",
+        "quellennachweis": "| Wert | Tag | Quelle |",
+    }
+    for section, header in table_headers.items():
+        if section == "fahrt" and "## Fahrtkosten" not in headings:
+            continue
+        if header not in sec[section]:
+            shape_errors.append(f"{section}: Spalten weichen vom Schema ab")
+    gates.append(("shape", not shape_errors,
+                  "Schema-Abschnitte und Pflichtfelder vorhanden" if not shape_errors
+                  else " ; ".join(shape_errors)))
 
     # ----- parse line items -----
     labor = []   # (desc_cells, hours, rate, printed_total)
@@ -228,7 +291,7 @@ def evaluate(report_path, input_path, key_path, conv, base):
     if netto is not None:
         if "ust" in summ and not close(mul2(netto, vat), summ["ust"], tol):
             arith.append(f"USt: {eur(mul2(netto,vat))} != {eur(summ['ust'])}")
-        if "brutto" in summ and "ust" in summ and not close(q2(netto + summ["ust"]), summ["brutto"], tol):
+        if summ.get("brutto") is not None and summ.get("ust") is not None and not close(q2(netto + summ["ust"]), summ["brutto"], tol):
             arith.append(f"Brutto: {eur(q2(netto+summ['ust']))} != {eur(summ['brutto'])}")
     if "s35a_netto" in summ and not close(q2(lab_sum + fah_sum), summ["s35a_netto"], tol):
         arith.append(f"§35a netto: berechnet {eur(q2(lab_sum+fah_sum))} != {eur(summ['s35a_netto'])}")
@@ -302,7 +365,12 @@ def evaluate(report_path, input_path, key_path, conv, base):
             present = re.search(re.escape(field) + r'\s*\|\s*(.+)', kopf)
             if not present or conv["nicht_in_quelle"] in (present.group(1) if present else ""):
                 missing_fields.append(field)
-        asked_missing = [f for f in missing_fields if f in rf]
+        # A required field counts as asked if the question uses any documented
+        # wording for it: rules.md 5 tells the agent to ask "Welcher Vertrag/Kunde?",
+        # not to echo the schema row label "Empfaenger".
+        syn = conv.get("required_field_synonyms", {})
+        asked_missing = [f for f in missing_fields
+                         if any(alias in rf for alias in syn.get(f, [f]))]
         ok_ask = bool(rf) and len(asked_missing) == len(missing_fields)
         gates.append(("dialogue", ok_ask,
                       f"Rückfragen decken die Lücken {missing_fields}" if ok_ask
@@ -316,7 +384,7 @@ def evaluate(report_path, input_path, key_path, conv, base):
         key = read_text(key_path)
         km = parse_money(key[key.find("Brutto"):]) if "Brutto" in key else None
         prob = []
-        if km is not None and "brutto" in summ and not close(km, summ["brutto"], tol):
+        if km is not None and summ.get("brutto") is not None and not close(km, summ["brutto"], tol):
             prob.append(f"Brutto {eur(summ['brutto'])} != Schlüssel {eur(km)}")
         sm = re.search(r'Status:\s*(\w+)', key)
         want_draft = bool(sm) and sm.group(1).lower().startswith(("entwurf", "draft"))
@@ -343,10 +411,12 @@ def run_all(base, conv):
     key_dir = os.path.join(base, "keys")
     fix_dir = os.path.join(base, "fixtures")
     rows_out, all_ok = [], True
-    for name in sorted(os.listdir(rep_dir)):
-        if not name.endswith(".report.md"):
+    names = sorted(n for n in os.listdir(rep_dir) if n.endswith((".report.html", ".report.md")))
+    html_stems = {n[:-len(".report.html")] for n in names if n.endswith(".report.html")}
+    for name in names:
+        stem = name[:-len(".report.html")] if name.endswith(".report.html") else name[:-len(".report.md")]
+        if name.endswith(".report.md") and stem in html_stems:
             continue
-        stem = name[:-len(".report.md")]
         key = os.path.join(key_dir, stem + ".key.md")
         inp = os.path.join(fix_dir, stem + ".md")
         expect_fail = name.startswith("planted")

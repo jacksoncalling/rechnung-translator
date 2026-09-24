@@ -1,236 +1,61 @@
 # Examples
 
-Three pairs. Example 1 shows the contract holding on a clean job. Example 2 shows it breaking gracefully on missing fields, marking gaps instead of filling them. Example 3 shows it refusing an out-of-scope input instead of branching. All figures trace; check them.
+Three input/output pairs show the same schema on a complete job, an incomplete job, and an English job note. The report files are worked examples and answer keys for the audit. **Do not give them to the agent during a cold run.**
 
-All three run against `reference/contracts/musterstadt-eg.md` (Stundensatz 60,00 €, Helfer laut Datei, Materialaufschlag 15 %, Fahrt 0,50 €/km, Zahlungsziel 14 Tage).
+| Case | Input | Expected output | What it exercises |
+|---|---|---|---|
+| 1 — complete repair job | [job record](audit/fixtures/01-clean-complete.md) | [HTML invoice](audit/reports/01-clean-complete.report.html) | Multiple days, two workers, three materials, travel, non-billable note. |
+| 2 — missing fields | [job record](audit/fixtures/02-missing-fields.md) | [HTML draft](audit/reports/02-missing-fields.report.html) | `nicht in Quelle`, concise Rückfragen, no invented date or number. |
+| 3 — English note | [job record](audit/fixtures/03-english-helper.md) | [HTML invoice](audit/reports/03-english-helper.report.html) | German output, helper's billable rate, one round-trip distance, net receipt amount. |
 
----
+The input and output are kept in separate files so a test runner can expose only the input to a fresh agent. The HTML outputs are rendered from the fixed intermediate form in `reference/schema.md`; the agent should reproduce its **contract**, not memorize its wording.
 
-## Example 1 — clean job, contract holds
+## Case 2 in full, so this file stands on its own
 
-### Input
-
-```
-Vertrag: Musterstadt eG
-Rechnungsnummer: BR-2026-011
-Rechnungsdatum: 15.09.2026
-
-Di 02.09.: Wohnungstür klemmt, Schloss nachgestellt. 2,0 Std. Anfahrt 10 km.
-Material: Baumarkt 02.09., Schmiermittel und Kleinteile. 11,90 €
-```
-
-### Output
-
-```
-Berg Reparatur- und Hausmeisterservice · Jonas Berg
-Beispielweg 12, 52070 Aachen · jonas@berg-reparatur.example
-
-An:
-Wohnbaugenossenschaft Musterstadt eG
-z. Hd. Frau Hartmann, Technik
-Genossenschaftsplatz 1, 45000 Musterstadt
-
-Rechnungsnummer    BR-2026-011
-Rechnungsdatum     15.09.2026
-Leistungszeitraum  02.09.2026
-Bezug              Rahmenauftrag Instandhaltung 2026 (WG-Musterstadt)
-
-Leistungen
-
-  Arbeitsleistung
-  | Leistung                          | Std | Satz netto | Gesamt netto |
-  | Wohnungstür, Schloss nachgestellt | 2,0 |   60,00 €  |    120,00 €  |
-
-  Material
-  | Position                        | Einkauf  | Aufschlag | Gesamt netto |
-  | Schmiermittel und Kleinteile    | 11,90 €  | × 1,15    |    13,69 €   |
-
-  Fahrtkosten
-  | km | Satz netto | Gesamt netto |
-  | 10 |  0,50 €    |    5,00 €    |
-
-  Zwischensumme netto                              138,69 €
-  Nettobetrag                                      138,69 €
-  davon Arbeits- und Fahrtkosten (§ 35a EStG)      125,00 € netto / 148,75 € brutto
-  zzgl. 19 % USt                                    26,35 €
-  Rechnungsbetrag                                  165,04 €
-
-Zahlung
-  Zahlbar ohne Abzug bis 29.09.2026
-  Kontoinhaber: Jonas Berg · IBAN DE00 0000 0000 0000 0000 00
-  Verwendungszweck: BR-2026-011
-
-Gewährleistung: 2 Jahre ab Abnahme (§ 634a BGB)
-Steuernummer 201/1234/5678 · IBAN DE00 0000 0000 0000 0000 00
-
-Quellennachweis
-  | Wert                         | Tag | Quelle |
-  | BR-2026-011                  | Q   | Input, Zeile "Rechnungsnummer" |
-  | 15.09.2026                   | Q   | Input, Zeile "Rechnungsdatum" |
-  | Kunde, Anschrift             | R   | contracts/musterstadt-eg.md |
-  | Leistungstext                | Q   | Input, "Wohnungstür ... Schloss nachgestellt" |
-  | 2,0 Std                      | Q   | Input, "2,0 Std" |
-  | 60,00 € Satz                 | R   | contracts/musterstadt-eg.md |
-  | 120,00 € Arbeit              | A   | 2,0 × 60,00 |
-  | 11,90 € Einkauf              | Q   | Input, Beleg Baumarkt 02.09. |
-  | 13,69 € Material netto       | A   | 11,90 × 1,15 = 13,685 → 13,69 |
-  | 10 km                        | Q   | Input, "Anfahrt 10 km" |
-  | 5,00 € Fahrt                 | A   | 10 × 0,50 |
-  | 138,69 € Zwischensumme/Netto | A   | 120,00 + 13,69 + 5,00 |
-  | 125,00 € § 35a netto         | A   | 120,00 + 5,00 (Material ausgenommen) |
-  | 148,75 € § 35a brutto        | A   | 125,00 × 1,19 |
-  | 26,35 € USt                  | A   | 138,69 × 0,19 = 26,3511 → 26,35 |
-  | 165,04 € Brutto              | A   | 138,69 + 26,35 |
-  | 29.09.2026 Fälligkeit        | A   | 15.09.2026 + 14 Tage (contract) |
-
-Nicht abgebildet
-  (nichts — jede Zeile des Job-Records wurde abgebildet)
-```
-
----
-
-## Example 2 — missing fields, marked not filled
-
-Input has no Rechnungsdatum, an illegible receipt amount, no distance for the trip, and a future request. The translator marks each gap and refuses to invent.
-
-### Input
+**Input** ([`02-missing-fields.md`](audit/fixtures/02-missing-fields.md)):
 
 ```
 Vertrag: Musterstadt eG
-Rechnungsnummer: BR-2026-012
 
-Do 04.09.: Gartentor, Scharnier getauscht. 1,0 Std.
-Material: Beleg Scharnier vorhanden, Betrag unleserlich.
-Notiz: Mieter fragte nach neuem Rollladen, kommt später.
+19.09.2026: Gartentor, lockeres Scharnier befestigt. Inhaber 2 Std.
+Notiz: Mieter fragte nach einem neuen Rollladen für nächsten Monat. Dazu wurde heute nichts ausgeführt.
 ```
 
-### Output
+**Output**, the lines that carry the contract (full file: [`02-missing-fields.report.html`](audit/reports/02-missing-fields.report.html)):
 
 ```
-Entwurf unvollständig — fehlende Pflichtangabe: Rechnungsdatum
+# Rechnung (Entwurf)
 
-Berg Reparatur- und Hausmeisterservice · Jonas Berg
-Beispielweg 12, 52070 Aachen
+Entwurf unvollständig — offen: Rechnungsnummer, Rechnungsdatum
 
-An:
-Wohnbaugenossenschaft Musterstadt eG
-z. Hd. Frau Hartmann, Technik
-Genossenschaftsplatz 1, 45000 Musterstadt
+| Rechnungsnummer   | nicht in Quelle |
+| Rechnungsdatum    | nicht in Quelle |
+| Leistungszeitraum | 19.09.2026      |
 
-Rechnungsnummer    BR-2026-012
-Rechnungsdatum     nicht in Quelle
-Leistungszeitraum  04.09.2026
-Bezug              Rahmenauftrag Instandhaltung 2026 (WG-Musterstadt)
+| Gartentor, lockeres Scharnier befestigt | Inhaber | 2 | 60,00 € | 120,00 € |
 
-Leistungen
+| Fällig | nicht in Quelle |
 
-  Arbeitsleistung
-  | Leistung                     | Std | Satz netto | Gesamt netto |
-  | Gartentor, Scharnier getauscht | 1,0 | 60,00 €   |    60,00 €   |
+## Quellennachweis
+| Rechnungsnummer, Rechnungsdatum | ∅ | nicht in Quelle |
+| 19.09.2026                      | Q | Input, Arbeitszeile |
+| 60,00 €                         | R | reference/contracts/musterstadt-eg.md, Stundensatz Inhaber |
+| 120,00 €                        | A | 2 × 60,00 |
 
-  Material
-  | Position           | Einkauf         | Aufschlag | Gesamt netto |
-  | Scharnier          | nicht in Quelle | —         | nicht in Quelle (aus Summe ausgenommen) |
+## Nicht abgebildet
+- Notiz: Mieter fragte nach einem neuen Rollladen ... — keine ausgeführte Leistung.
 
-  Fahrtkosten
-  | keine — Distanz nicht in Quelle |
-
-  Zwischensumme netto                              60,00 €
-  Nettobetrag                                      60,00 €
-  davon Arbeits- und Fahrtkosten (§ 35a EStG)      60,00 € netto / 71,40 € brutto
-  zzgl. 19 % USt                                   11,40 €
-  Rechnungsbetrag                                  71,40 €
-
-Zahlung
-  Zahlbar ohne Abzug bis nicht in Quelle (benötigt Rechnungsdatum)
-  Kontoinhaber: Jonas Berg · IBAN DE00 0000 0000 0000 0000 00
-  Verwendungszweck: BR-2026-012
-
-Gewährleistung: 2 Jahre ab Abnahme (§ 634a BGB)
-Steuernummer 201/1234/5678
-
-Quellennachweis
-  | Wert                    | Tag | Quelle |
-  | BR-2026-012             | Q   | Input, "Rechnungsnummer" |
-  | Rechnungsdatum          | ∅   | nicht in Quelle |
-  | 04.09.2026 Zeitraum     | A   | einziges Datum im Log |
-  | 1,0 Std                 | Q   | Input, "1,0 Std" |
-  | 60,00 € Arbeit          | A   | 1,0 × 60,00 |
-  | Scharnier Betrag        | ∅   | nicht in Quelle (Beleg unleserlich) |
-  | Fahrtdistanz            | ∅   | nicht in Quelle (nicht notiert) |
-  | 60,00 € Netto           | A   | nur Arbeit; Material und Fahrt fehlen |
-  | 11,40 € USt             | A   | 60,00 × 0,19 |
-  | 71,40 € Brutto          | A   | 60,00 + 11,40 |
-  | Fälligkeit              | ∅   | braucht Rechnungsdatum |
-
-Nicht abgebildet
-  | Rollladen-Anfrage des Mieters — keine Leistung erbracht, kein Auftrag, Zukunft |
+## Rückfragen
+- Rechnungsnummer? (BR-JJJJ-NNN)
+- Rechnungsdatum? (TT.MM.JJJJ)
 ```
 
-Note what did **not** happen: no invented date, no guessed material cost, no distance derived from the address, and the tenant's request was surfaced, not dropped. The invoice is produced so the person sees exactly the two things to fix (date, receipt amount) before it can go out.
+Note what did **not** happen: no invoice number invented, no today's date stamped in, no Fälligkeit guessed from a date that does not exist, and the tenant's Rollladen request surfaced rather than dropped. Every figure traces: the rate to the contract, the total to its formula, the date to the input line.
 
----
+## Follow-up for case 2
 
-## Example 3 — out of scope, refused
+If the user answers `Rechnungsnummer: BR-2026-022. Rechnungsdatum: 22.09.2026.`, the translator must replace the two missing fields, derive `Fällig: 06.10.2026`, and return a final invoice with the same labor and sums. It must keep the Rollladen note in `Nicht abgebildet` and remove `Rückfragen`.
 
-Input asks for a partial invoice. The folder handles one shape only, so it refuses.
+## Audio test
 
-### Input
-
-```
-Vertrag: Musterstadt eG
-Rechnungsnummer: BR-2026-013
-Rechnungsdatum: 20.09.2026
-
-Kunde möchte 50 % Abschlag jetzt, Rest nach Abschluss.
-Mo 15.09.: Fassade Vorarbeiten. 4 Std.
-```
-
-### Output
-
-```
-ABLEHNUNG — ausserhalb des Vertrags
-
-Dieser Übersetzer erzeugt nur Standard-Inlandsrechnungen mit 19 % USt.
-Ausgelöst durch: "Kunde möchte 50 % Abschlag jetzt, Rest nach Abschluss."
-Grund: Abschlag/Anzahlung braucht Anzahlungslogik und den Abzug bereits
-berechneter USt in der Schlussrechnung (§ 14c UStG). Das ist eine eigene Form.
-
-Es wurde keine Rechnung erzeugt. Für diesen Fall ist eine andere Form nötig.
-```
-
-No partial invoice. No attempt to bill the 4 hours anyway. Trigger named, refused, done.
-
----
-
-## Example 4 — receipt read from a photo, unreadable digit not guessed
-
-The job record points to a photo in `input/belege/` instead of describing the receipt. The translator reads it, and where a digit is not legible, it marks it rather than guessing.
-
-### Input (job record line)
-
-```
-Material: siehe Beleg input/belege/beleg-baumarkt-08-09.png
-```
-
-### Intermediate step the translator emits first (human confirms it)
-
-```
-Beleg-Extraktion
-| Datei                      | Händler              | Datum      | Position              | Betrag netto | Lesbarkeit |
-| beleg-baumarkt-08-09.png   | Baumarkt Musterstadt | 08.09.2026 | Dichtungssortiment+Öl | 42,02 €      | klar       |
-```
-
-That confirmed 42,02 € then feeds the Material line exactly as in Example 1: `42,02 × 1,15 = 48,32 €`, tagged `Q → Beleg-Foto beleg-baumarkt-08-09.png`.
-
-### What happens when a digit is smudged
-
-Had the total read `6?,80 €` with the second figure unclear:
-
-```
-| beleg-farbenhaus-10-09.jpg | Farbenhaus | 10.09.2026 | Holzlack+Pinsel | 6?,80 € | zweite Ziffer nicht sicher lesbar |
-```
-
-The Material line stays, the amount is `nicht sicher lesbar`, it is excluded from every sum, and it is flagged for confirmation. No plausible `63,80` gets invented from a blur.
-
-The photo raises the bar, it does not lower it. The one way to lose this comp is an invented number, and a blurry receipt is the easiest place to trip it. Unreadable means unreadable.
+A recorded voice note can be the input after transcription. Preserve the transcription verbatim as the source; do not silently repair uncertain words or numbers. Run the fresh agent with the transcript and the allowed reference files, then compare every invoice fact to the transcript or a named reference field. Audio itself and the transcription are separate evidence: if the transcription is uncertain, ask rather than infer.
