@@ -67,3 +67,7 @@ This is v1, and it does one thing well: a domestic 19 % repair invoice from a jo
 All identities, addresses, tax numbers, bank details, and the Wohnbaugenossenschaft Musterstadt eG are **fictional**. The folder is the method; real invoices run against a private `reference/` that never ships. Nothing here is a real person, a real company, or a real bank account.
 
 MIT-licensed method (ICM, Van Clief & McDermott, arXiv:2603.16021).
+
+## License
+
+[MIT](LICENSE) © 2026 Joshua Baker. Not legal or tax advice: check any generated invoice against § 14 UStG before you send it.
